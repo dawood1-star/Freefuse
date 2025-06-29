@@ -3,38 +3,458 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Freefuse</title>
+    <title>Freefuse - Pattern Lock</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
-        line-height: 1.6;
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        overflow: hidden;
       }
-      .header {
+
+      .game-container {
         text-align: center;
-        margin-bottom: 2rem;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
       }
-      .content {
-        background: #f5f5f5;
-        padding: 2rem;
-        border-radius: 8px;
+
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .pattern-container {
+        position: relative;
+        margin: 30px auto;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .pattern-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        padding: 40px;
+        height: 100%;
+      }
+
+      .pattern-dot {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        user-select: none;
+      }
+
+      .pattern-dot:hover {
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
+      }
+
+      .pattern-dot.active {
+        background: #8b5cf6;
+        border-color: #a855f7;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+        transform: scale(1.2);
+      }
+
+      .pattern-dot.active::after {
+        content: "";
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+      }
+
+      .pattern-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: 15px;
+      }
+
+      .controls {
+        margin-top: 30px;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 0 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .status {
+        margin-top: 20px;
+        font-size: 18px;
+        min-height: 25px;
+      }
+
+      .status.success {
+        color: #10b981;
+      }
+
+      .status.error {
+        color: #ef4444;
+      }
+
+      .pattern-sequence {
+        margin-top: 15px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .level-info {
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      @media (max-width: 480px) {
+        .pattern-container {
+          width: 280px;
+          height: 280px;
+        }
+
+        .pattern-grid {
+          gap: 20px;
+          padding: 30px;
+        }
+
+        .pattern-dot {
+          width: 50px;
+          height: 50px;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="header">
-      <h1>Freefuse</h1>
-      <p>Company project</p>
+    <div class="game-container">
+      <h1 class="title">Draw the correct pattern to unlock the next scene!</h1>
+
+      <div class="level-info">Level: <span id="currentLevel">1</span></div>
+
+      <div class="pattern-container">
+        <canvas
+          class="pattern-canvas"
+          id="patternCanvas"
+          width="300"
+          height="300"
+        ></canvas>
+        <div class="pattern-grid" id="patternGrid">
+          <div class="pattern-dot" data-index="0"></div>
+          <div class="pattern-dot" data-index="1"></div>
+          <div class="pattern-dot" data-index="2"></div>
+          <div class="pattern-dot" data-index="3"></div>
+          <div class="pattern-dot" data-index="4"></div>
+          <div class="pattern-dot" data-index="5"></div>
+          <div class="pattern-dot" data-index="6"></div>
+          <div class="pattern-dot" data-index="7"></div>
+          <div class="pattern-dot" data-index="8"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="submitBtn" disabled>Submit Pattern</button>
+        <button class="btn" id="clearBtn">Clear</button>
+        <button class="btn" id="showHintBtn">Show Hint</button>
+      </div>
+
+      <div class="status" id="statusMessage"></div>
+      <div class="pattern-sequence" id="patternSequence"></div>
     </div>
-    <div class="content">
-      <h2>Welcome!</h2>
-      <p>Your development server is now running successfully.</p>
-      <p>
-        You can start building your application by modifying the files in this
-        project.
-      </p>
-    </div>
+
+    <script>
+      class PatternLock {
+        constructor() {
+          this.canvas = document.getElementById("patternCanvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.grid = document.getElementById("patternGrid");
+          this.dots = document.querySelectorAll(".pattern-dot");
+          this.selectedPattern = [];
+          this.isDrawing = false;
+          this.currentLevel = 1;
+          this.dotPositions = [];
+
+          // Predefined patterns for each level
+          this.levelPatterns = {
+            1: [0, 1, 2, 5, 8], // L shape
+            2: [0, 4, 8], // Diagonal
+            3: [1, 3, 5, 7], // Plus shape
+            4: [0, 1, 2, 5, 8, 7, 6], // Complex L
+            5: [0, 2, 6, 8, 4], // X with center
+          };
+
+          this.init();
+        }
+
+        init() {
+          this.calculateDotPositions();
+          this.attachEventListeners();
+          this.updateLevel();
+        }
+
+        calculateDotPositions() {
+          this.dotPositions = [];
+          this.dots.forEach((dot) => {
+            const rect = dot.getBoundingClientRect();
+            const containerRect = this.canvas.getBoundingClientRect();
+            const x = rect.left + rect.width / 2 - containerRect.left;
+            const y = rect.top + rect.height / 2 - containerRect.top;
+            this.dotPositions.push({ x, y });
+          });
+        }
+
+        attachEventListeners() {
+          // Mouse events
+          this.dots.forEach((dot, index) => {
+            dot.addEventListener("mousedown", (e) =>
+              this.startPattern(index, e),
+            );
+            dot.addEventListener("mouseenter", (e) => this.addToDot(index, e));
+          });
+
+          document.addEventListener("mouseup", () => this.endPattern());
+
+          // Touch events for mobile
+          this.dots.forEach((dot, index) => {
+            dot.addEventListener("touchstart", (e) => {
+              e.preventDefault();
+              this.startPattern(index, e);
+            });
+            dot.addEventListener("touchmove", (e) => {
+              e.preventDefault();
+              const touch = e.touches[0];
+              const element = document.elementFromPoint(
+                touch.clientX,
+                touch.clientY,
+              );
+              if (element && element.classList.contains("pattern-dot")) {
+                const index = parseInt(element.dataset.index);
+                this.addToDot(index, e);
+              }
+            });
+          });
+
+          document.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            this.endPattern();
+          });
+
+          // Button events
+          document
+            .getElementById("submitBtn")
+            .addEventListener("click", () => this.submitPattern());
+          document
+            .getElementById("clearBtn")
+            .addEventListener("click", () => this.clearPattern());
+          document
+            .getElementById("showHintBtn")
+            .addEventListener("click", () => this.showHint());
+
+          // Prevent context menu
+          this.canvas.addEventListener("contextmenu", (e) =>
+            e.preventDefault(),
+          );
+        }
+
+        startPattern(index, event) {
+          event.preventDefault();
+          this.isDrawing = true;
+          this.addToDot(index, event);
+        }
+
+        addToDot(index, event) {
+          if (!this.isDrawing || this.selectedPattern.includes(index)) return;
+
+          this.selectedPattern.push(index);
+          this.dots[index].classList.add("active");
+          this.drawConnections();
+          this.updateUI();
+        }
+
+        endPattern() {
+          this.isDrawing = false;
+        }
+
+        drawConnections() {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+          if (this.selectedPattern.length < 2) return;
+
+          this.ctx.strokeStyle = "#8b5cf6";
+          this.ctx.lineWidth = 4;
+          this.ctx.lineCap = "round";
+          this.ctx.shadowColor = "#8b5cf6";
+          this.ctx.shadowBlur = 10;
+
+          this.ctx.beginPath();
+          for (let i = 0; i < this.selectedPattern.length; i++) {
+            const dotIndex = this.selectedPattern[i];
+            const pos = this.dotPositions[dotIndex];
+
+            if (i === 0) {
+              this.ctx.moveTo(pos.x, pos.y);
+            } else {
+              this.ctx.lineTo(pos.x, pos.y);
+            }
+          }
+          this.ctx.stroke();
+
+          // Draw dots on the line
+          this.selectedPattern.forEach((dotIndex) => {
+            const pos = this.dotPositions[dotIndex];
+            this.ctx.beginPath();
+            this.ctx.fillStyle = "#a855f7";
+            this.ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI);
+            this.ctx.fill();
+          });
+        }
+
+        updateUI() {
+          const submitBtn = document.getElementById("submitBtn");
+          const sequenceEl = document.getElementById("patternSequence");
+
+          submitBtn.disabled = this.selectedPattern.length === 0;
+          sequenceEl.textContent = `Pattern: ${this.selectedPattern.join(" → ")}`;
+        }
+
+        submitPattern() {
+          const currentPattern = this.levelPatterns[this.currentLevel];
+          const isCorrect = this.arraysEqual(
+            this.selectedPattern,
+            currentPattern,
+          );
+
+          const statusEl = document.getElementById("statusMessage");
+
+          if (isCorrect) {
+            statusEl.textContent = "✅ Correct! Moving to next level...";
+            statusEl.className = "status success";
+
+            setTimeout(() => {
+              this.currentLevel++;
+              if (this.currentLevel > Object.keys(this.levelPatterns).length) {
+                statusEl.textContent =
+                  "🎉 Congratulations! You completed all levels!";
+                return;
+              }
+              this.updateLevel();
+              this.clearPattern();
+            }, 2000);
+          } else {
+            statusEl.textContent = "❌ Incorrect pattern. Try again!";
+            statusEl.className = "status error";
+
+            // Clear after showing error
+            setTimeout(() => this.clearPattern(), 1500);
+          }
+        }
+
+        clearPattern() {
+          this.selectedPattern = [];
+          this.dots.forEach((dot) => dot.classList.remove("active"));
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.updateUI();
+
+          const statusEl = document.getElementById("statusMessage");
+          statusEl.textContent = "";
+          statusEl.className = "status";
+        }
+
+        showHint() {
+          const currentPattern = this.levelPatterns[this.currentLevel];
+          const statusEl = document.getElementById("statusMessage");
+          statusEl.textContent = `💡 Hint: Connect dots ${currentPattern.join(" → ")}`;
+          statusEl.className = "status";
+
+          // Briefly highlight the correct dots
+          currentPattern.forEach((dotIndex, i) => {
+            setTimeout(() => {
+              this.dots[dotIndex].style.background = "#fbbf24";
+              setTimeout(() => {
+                this.dots[dotIndex].style.background = "";
+              }, 500);
+            }, i * 200);
+          });
+        }
+
+        updateLevel() {
+          document.getElementById("currentLevel").textContent =
+            this.currentLevel;
+          const statusEl = document.getElementById("statusMessage");
+          statusEl.textContent = `Level ${this.currentLevel}: Draw the pattern to continue`;
+          statusEl.className = "status";
+        }
+
+        arraysEqual(a, b) {
+          return a.length === b.length && a.every((val, i) => val === b[i]);
+        }
+      }
+
+      // Initialize the game when DOM is loaded
+      document.addEventListener("DOMContentLoaded", () => {
+        new PatternLock();
+      });
+
+      // Handle window resize
+      window.addEventListener("resize", () => {
+        setTimeout(() => {
+          if (window.patternLock) {
+            window.patternLock.calculateDotPositions();
+          }
+        }, 100);
+      });
+    </script>
   </body>
 </html>
