@@ -1,12 +1,12 @@
 {
   "name": "code",
   "version": "1.0.0",
-  "description": "",
+  "description": "Freefuse company project",
   "main": "index.js",
   "scripts": {
-    "dev": "echo 'Dev server placeholder - please configure your actual dev command'",
+    "dev": "npx http-server . -p 3000 -c-1",
     "build": "echo 'Build placeholder'",
-    "start": "echo 'Start placeholder'"
+    "start": "npm run dev"
   },
   "keywords": [],
   "author": "",
