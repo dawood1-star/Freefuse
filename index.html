@@ -172,21 +172,23 @@
         box-shadow: 0 4px 15px rgba(116, 51, 255, 0.3);
       }
 
-      .btn:hover {
+      .submit-btn:hover,
+      .clear-btn:hover,
+      .hint-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        opacity: 0.9;
       }
 
-      .btn:disabled {
+      .submit-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
         transform: none;
       }
 
       .status {
-        margin-top: 20px;
-        font-size: 18px;
-        min-height: 25px;
+        margin-top: 16px;
+        font-size: 16px;
+        min-height: 20px;
       }
 
       .status.success {
@@ -198,31 +200,35 @@
       }
 
       .pattern-sequence {
-        margin-top: 15px;
+        margin-top: 12px;
         font-size: 14px;
         color: rgba(255, 255, 255, 0.7);
       }
 
-      .level-info {
-        margin-bottom: 20px;
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.8);
+      .hidden {
+        display: none;
       }
 
       @media (max-width: 480px) {
-        .pattern-container {
-          width: 280px;
-          height: 280px;
+        .container {
+          padding: 30px 20px;
         }
 
         .pattern-grid {
-          gap: 20px;
-          padding: 30px;
+          grid-template-columns: repeat(3, 60px);
+          gap: 16px;
         }
 
         .pattern-dot {
-          width: 50px;
-          height: 50px;
+          width: 60px;
+          height: 60px;
+        }
+
+        .pattern-canvas {
+          top: 16px;
+          left: 16px;
+          width: calc(100% - 32px);
+          height: calc(100% - 32px);
         }
       }
     </style>
