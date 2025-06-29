@@ -451,7 +451,12 @@
               this.currentLevel++;
               if (this.currentLevel > Object.keys(this.levelPatterns).length) {
                 statusEl.textContent =
-                  "🎉 Congratulations! You completed all levels!";
+                  "🎉 Congratulations! All levels completed!";
+                setTimeout(() => {
+                  document.getElementById("patternOverlay").style.display =
+                    "none";
+                  console.log("Scene unlocked! Game completed successfully.");
+                }, 2000);
                 return;
               }
               this.updateLevel();
