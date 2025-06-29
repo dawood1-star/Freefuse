@@ -234,39 +234,49 @@
     </style>
   </head>
   <body>
-    <div class="game-container">
-      <h1 class="title">Draw the correct pattern to unlock the next scene!</h1>
+    <div class="background-content">
+      <div>🎮 Freefuse Game Background</div>
+    </div>
 
-      <div class="level-info">Level: <span id="currentLevel">1</span></div>
+    <div class="pattern-overlay" id="patternOverlay">
+      <div class="container">
+        <h2 class="title">
+          Draw the correct pattern to unlock the next scene!
+        </h2>
 
-      <div class="pattern-container">
-        <canvas
-          class="pattern-canvas"
-          id="patternCanvas"
-          width="300"
-          height="300"
-        ></canvas>
-        <div class="pattern-grid" id="patternGrid">
-          <div class="pattern-dot" data-index="0"></div>
-          <div class="pattern-dot" data-index="1"></div>
-          <div class="pattern-dot" data-index="2"></div>
-          <div class="pattern-dot" data-index="3"></div>
-          <div class="pattern-dot" data-index="4"></div>
-          <div class="pattern-dot" data-index="5"></div>
-          <div class="pattern-dot" data-index="6"></div>
-          <div class="pattern-dot" data-index="7"></div>
-          <div class="pattern-dot" data-index="8"></div>
+        <div class="level-info">Level: <span id="currentLevel">1</span></div>
+
+        <div class="pattern-container">
+          <canvas
+            class="pattern-canvas"
+            id="patternCanvas"
+            width="260"
+            height="260"
+          ></canvas>
+          <div class="pattern-grid" id="patternGrid">
+            <div class="pattern-dot" data-index="0"></div>
+            <div class="pattern-dot" data-index="1"></div>
+            <div class="pattern-dot" data-index="2"></div>
+            <div class="pattern-dot" data-index="3"></div>
+            <div class="pattern-dot" data-index="4"></div>
+            <div class="pattern-dot" data-index="5"></div>
+            <div class="pattern-dot" data-index="6"></div>
+            <div class="pattern-dot" data-index="7"></div>
+            <div class="pattern-dot" data-index="8"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="controls">
-        <button class="btn" id="submitBtn" disabled>Submit Pattern</button>
-        <button class="btn" id="clearBtn">Clear</button>
-        <button class="btn" id="showHintBtn">Show Hint</button>
-      </div>
+        <div class="buttons">
+          <button class="submit-btn" id="submitBtn" disabled>
+            Submit Pattern
+          </button>
+          <button class="clear-btn" id="clearBtn">Clear</button>
+        </div>
+        <button class="hint-btn" id="showHintBtn">Show Hint</button>
 
-      <div class="status" id="statusMessage"></div>
-      <div class="pattern-sequence" id="patternSequence"></div>
+        <div class="status" id="statusMessage"></div>
+        <div class="pattern-sequence" id="patternSequence"></div>
+      </div>
     </div>
 
     <script>
