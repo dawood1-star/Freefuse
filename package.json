@@ -1,0 +1,14 @@
+{
+  "name": "code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "echo 'Dev server placeholder - please configure your actual dev command'",
+    "build": "echo 'Build placeholder'",
+    "start": "echo 'Start placeholder'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
